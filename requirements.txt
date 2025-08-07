@@ -1,0 +1,5 @@
+nicegui
+python-sane # Also needs libsane-dev on Debian/Ubuntu
+pillow
+pypdf
+requests
