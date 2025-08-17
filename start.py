@@ -1,4 +1,4 @@
-from .ui import UI
+from rpi_paperless.ui import UI
 
 import sane
 
