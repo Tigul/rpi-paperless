@@ -4,7 +4,7 @@
 
  [Service]
  Type=idle
- ExecStart=source /home/pi/rpi-paperless/paperless-venv/bin/activate && /usr/bin/python -m /home/pi/rpi-paperless/src/start.py
+ ExecStart=/home/pi/rpi-paperless/paperless-venv/bin/python /home/pi/rpi-paperless/start.py
 
  [Install]
  WantedBy=multi-user.target
