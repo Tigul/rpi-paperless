@@ -1,7 +1,7 @@
 import base64
 import os
 
-from src.utils import notify
+from .utils import notify
 
 
 class Credentials:
