@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rpi_paperless"
+authors = [
+    { name="Jonas Dech", email="j.dech@gmx.net" },
+
+]
+description = "A lightweight interface for Raspberry Pi to scan paperless documents."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+keywords=["paperless-ngx"]
+dynamic = ["version", "dependencies"]
+license = { text = "LGPL-3.0-only" }
+
+[project.urls]
+"Source" = 'https://github.com/tomsch420/semantic_world'
+"Bug Tracker" = 'https://github.com/tomsch420/semantic_world/issues'
+
+[tool.setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
+include = ["semantic_world*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "rpi_paperless.__version__"}
+dependencies = {file = "requirements.txt"}
+

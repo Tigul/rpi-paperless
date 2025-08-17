@@ -100,7 +100,7 @@ class UI:
         self.scanner_device.scan(self.current_document, upload, self.credentials, self.paperless_url)
 
     def upload(self):
-        upload_thread = UploadThread(self.current_document, self.scanner_device.scanning_event, self.credentials,
+        upload_thread = UploadThread(self.current_document, self.credentials,
                                      self.paperless_url, name="Upload", daemon=True)
         upload_thread.start()
 

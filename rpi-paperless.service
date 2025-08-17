@@ -1,0 +1,10 @@
+ [Unit]
+ Description=Paperless Interface for the Raspberry Pi
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ ExecStart=source /home/pi/rpi-paperless/paperless-venv/bin && /usr/bin/python -m /home/pi/rpi-paperless/src/start.py
+
+ [Install]
+ WantedBy=multi-user.target
