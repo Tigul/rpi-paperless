@@ -6,6 +6,6 @@ source paperless-venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-ln -s rpi-paperless.service /etc/systemd/system/paperless.service
+ln -s ~/rpi-paperless/rpi-paperless.service /etc/systemd/system/paperless.service
 
 
