@@ -1,3 +1,4 @@
+import os
 from threading import Thread, Event
 
 import httpx
@@ -26,6 +27,7 @@ class UploadThread(Thread):
         self.doc = doc
         self.credentials = creds
         self.url = url
+        self.document_path = os.path.join(os.path.dirname(__file__), "..", "..", "merges", "merged_scans.pdf")
         print("UploadThread initialized with URL:", self.url)
 
     def run(self):
@@ -44,7 +46,7 @@ class UploadThread(Thread):
             notify(f"Uploading scans ...")
             resp = httpx.post(url + "/api/documents/post_document/",
                               headers={"Authorization": "Basic " + self.credentials.credentials_b64},
-                              files={'document': ('scan.pdf', open('merged_scans.pdf', 'rb'), 'application/pdf')},
+                              files={'document': ('scan.pdf', open(self.document_path, 'rb'), 'application/pdf')},
                               data={"title": "Scanned Document", "created": "2023-12-21"})
             print(resp.status_code)
             if resp.status_code == 200:

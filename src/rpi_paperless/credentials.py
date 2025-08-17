@@ -9,7 +9,7 @@ class Credentials:
         self.username = username
         self.password = password
         self.save_credentials = save_credentials
-        self.credentials_path = os.path.join(os.path.dirname(__file__), "..", "credentials", "credentials.txt")
+        self.credentials_path = os.path.join(os.path.dirname(__file__), "..", "..", "credentials", "credentials.txt")
         self.crete_directory()
 
         self.credentials_b64 = None
