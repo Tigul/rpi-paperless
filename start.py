@@ -3,6 +3,9 @@ from rpi_paperless.ui import UI
 import sane
 
 if __name__ in {"__main__", "__mp_main__"}:
+    # SANE must be initialised before any other sane.* call is made.
+    sane.init()
+
     ui = UI()
     ui.create_ui()
     ui.update_printer_selection()
@@ -11,7 +14,4 @@ if __name__ in {"__main__", "__mp_main__"}:
     # scanner_watcher = ScannerWatcher(ui.printer_select)
     # scanner_watcher.start()
 
-    sane.init()
     ui.start()
-    ui.update_printer_selection()
-

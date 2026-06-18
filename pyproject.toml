@@ -13,7 +13,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Operating System :: OS Independent",
 ]
 keywords=["paperless-ngx"]
@@ -21,12 +21,12 @@ dynamic = ["version", "dependencies"]
 license = { text = "LGPL-3.0-only" }
 
 [project.urls]
-"Source" = 'https://github.com/tomsch420/semantic_world'
-"Bug Tracker" = 'https://github.com/tomsch420/semantic_world/issues'
+"Source" = 'https://github.com/Tigul/rpi-paperless'
+"Bug Tracker" = 'https://github.com/Tigul/rpi-paperless/issues'
 
 [tool.setuptools.packages.find]
 where = ["src"]  # list of folders that contain the packages (["."] by default)
-include = ["semantic_world*"]
+include = ["rpi_paperless*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "rpi_paperless.__version__"}

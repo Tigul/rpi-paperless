@@ -37,6 +37,11 @@ class UI:
         self.scanner_device: Scanner = None
 
         self.paperless_url = None
+        # Anchor the saved URL next to the credentials/merges instead of the
+        # current working directory, which is undefined when run as a service.
+        self.paperless_url_path = os.path.join(
+            os.path.dirname(__file__), "..", "..", "config", "paperless_url.txt")
+        os.makedirs(os.path.dirname(self.paperless_url_path), exist_ok=True)
 
         self.credentials = Credentials()
 
@@ -109,7 +114,7 @@ class UI:
 
     def do_save_url(self):
         if self.save_url.value:
-            with open('paperless_url.txt', 'w') as f:
+            with open(self.paperless_url_path, 'w') as f:
                 f.write(self.paperless_url_input.value)
             ui.notify("Paperless URL saved!")
         else:
@@ -117,11 +122,11 @@ class UI:
         self.paperless_url = self.paperless_url_input.value
 
     def load_paperless_url(self):
-        if os.path.exists('paperless_url.txt'):
-            with open('paperless_url.txt', 'r') as f:
+        if os.path.exists(self.paperless_url_path):
+            with open(self.paperless_url_path, 'r') as f:
                 self.paperless_url = f.read().strip()
                 self.paperless_url_input.value = self.paperless_url
                 ui.notify(f'Loaded Paperless URL: {self.paperless_url}')
 
     def start(self):
-        ui.run()
+        ui.run(host="0.0.0.0", port=8080, reload=False, show=False)

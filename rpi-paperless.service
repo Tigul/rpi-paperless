@@ -1,10 +1,15 @@
- [Unit]
- Description=Paperless Interface for the Raspberry Pi
- After=multi-user.target
+[Unit]
+Description=Paperless Interface for the Raspberry Pi
+After=network-online.target
+Wants=network-online.target
 
- [Service]
- Type=idle
- ExecStart=/home/pi/rpi-paperless/paperless-venv/bin/python /home/pi/rpi-paperless/start.py
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/rpi-paperless
+ExecStart=/home/pi/rpi-paperless/paperless-venv/bin/python /home/pi/rpi-paperless/start.py
+Restart=on-failure
+RestartSec=5
 
- [Install]
- WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target

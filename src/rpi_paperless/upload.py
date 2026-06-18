@@ -38,16 +38,17 @@ class UploadThread(Thread):
         """
         Send the request to upload the document to the Paperless instance.
         """
-        url = f"{self.url}/api/documents/post_document/"
+        url = f"{self.url.rstrip('/')}/api/documents/post_document/"
         if not self.credentials.credentials_b64:
             notify("Credentials are not set. Please set your credentials before uploading.")
             return
         try:
             notify(f"Uploading scans ...")
-            resp = httpx.post(url + "/api/documents/post_document/",
-                              headers={"Authorization": "Basic " + self.credentials.credentials_b64},
-                              files={'document': ('scan.pdf', open(self.document_path, 'rb'), 'application/pdf')},
-                              data={"title": "Scanned Document", "created": "2023-12-21"})
+            with open(self.document_path, 'rb') as document:
+                resp = httpx.post(url,
+                                  headers={"Authorization": "Basic " + self.credentials.credentials_b64},
+                                  files={'document': ('scan.pdf', document, 'application/pdf')},
+                                  data={"title": "Scanned Document"})
             print(resp.status_code)
             if resp.status_code == 200:
                 notify(f"Uploaded successfully to {self.url}")

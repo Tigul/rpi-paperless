@@ -12,15 +12,15 @@ import sane
 class Scanner:
     def __init__(self, scanner_device: str):
         self.device = None
-        if not scanner_device:
-            notify("No scanner device provided.")
-            return
         self.device_name = scanner_device
-        print(f"Initializing scanner device: {scanner_device}")
-        self.device = sane.open(scanner_device)
         self.running_scans = []
         self.scanning_event = Event()
         self.scanning_event.clear()
+        if not scanner_device:
+            notify("No scanner device provided.")
+            return
+        print(f"Initializing scanner device: {scanner_device}")
+        self.device = sane.open(scanner_device)
 
     @classmethod
     def get_devices(cls) -> List[str]:
