@@ -4,9 +4,11 @@
 individual scan off the UI thread and optionally triggers an upload afterwards.
 ``sane.init()`` must have been called before any of this is used.
 """
+from __future__ import annotations
+
 import time
 from threading import Thread, Event
-from typing import List
+from typing import List, Optional
 
 from .credentials import Credentials
 from .document import CurrentScan, Document
@@ -18,17 +20,17 @@ import sane
 class Scanner:
     """Wraps a single SANE scanner device and tracks its in-flight scans."""
 
-    def __init__(self, scanner_device: str):
+    def __init__(self, scanner_device: str) -> None:
         """Open the given SANE device.
 
         :param scanner_device: SANE device name (as returned by
             :meth:`get_devices`). If falsy, no device is opened and the scanner
             stays inert; :meth:`scan` will report that no device is available.
         """
-        self.device = None
-        self.device_name = scanner_device
-        self.running_scans = []
-        self.scanning_event = Event()
+        self.device: Optional[sane.SaneDev] = None
+        self.device_name: str = scanner_device
+        self.running_scans: List[ScanThread] = []
+        self.scanning_event: Event = Event()
         self.scanning_event.clear()
         if not scanner_device:
             notify("No scanner device provided.")
@@ -42,7 +44,7 @@ class Scanner:
         scanner = sane.get_devices()
         return [s[0] for s in scanner]
 
-    def scan(self, doc: Document, upload = False, creds: Credentials = None, url: str = None):
+    def scan(self, doc: Document, upload: bool = False, creds: Optional[Credentials] = None, url: Optional[str] = None) -> None:
         """Start scanning a single page in a background thread.
 
         The scan runs in a :class:`ScanThread` so the UI stays responsive; the
@@ -62,7 +64,7 @@ class Scanner:
         self.running_scans.append(scan_thread)
         scan_thread.start()
 
-    def close(self):
+    def close(self) -> None:
         """Close the underlying SANE device if one is open."""
         if self.device:
             self.device.close()
@@ -73,7 +75,7 @@ class Scanner:
         """True while at least one scan thread is still running."""
         return len(self.running_scans) > 0
 
-    def set_scanning_event(self):
+    def set_scanning_event(self) -> None:
         """Set the scanning event while scans are running, clear it otherwise."""
         if len(self.running_scans) > 0:
             self.scanning_event.set()
@@ -83,7 +85,7 @@ class Scanner:
 class ScanThread(Thread):
     """Performs a single scan off the UI thread and optionally uploads after."""
 
-    def __init__(self, scanner: Scanner, doc: Document, upload: bool, creds: Credentials = None, url: str = None, *args, **kwargs):
+    def __init__(self, scanner: Scanner, doc: Document, upload: bool, creds: Optional[Credentials] = None, url: Optional[str] = None, *args, **kwargs) -> None:
         """Configure the scan thread.
 
         :param scanner: Scanner whose device is used for the scan.
@@ -94,13 +96,13 @@ class ScanThread(Thread):
         """
         super().__init__(*args, **kwargs)
         self.daemon = True  # Ensure the thread doesn't block program exit
-        self.scanner = scanner
-        self.document = doc
-        self.upload = upload
-        self.creds = creds
-        self.url = url
+        self.scanner: Scanner = scanner
+        self.document: Document = doc
+        self.upload: bool = upload
+        self.creds: Optional[Credentials] = creds
+        self.url: Optional[str] = url
 
-    def run(self):
+    def run(self) -> None:
         """Scan one page, append it to the document and start the upload if requested."""
         notify("Starting scan...")
         scan_image = self.scanner.device.scan()

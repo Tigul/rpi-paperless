@@ -12,7 +12,7 @@ from .utils import notify
 class UploadThread(Thread):
     """Merges the document into a single PDF and POSTs it to Paperless-ngx."""
 
-    def __init__(self, doc: Document, creds: Credentials, url: str, name: str, daemon: bool = True, *args, **kwargs):
+    def __init__(self, doc: Document, creds: Credentials, url: str, name: str, daemon: bool = True, *args, **kwargs) -> None:
         """
         Initialize the UploadThread.
 
@@ -26,18 +26,18 @@ class UploadThread(Thread):
         """
         super().__init__(name=name, daemon=daemon, *args, **kwargs)
         self.daemon = True  # Ensure the thread doesn't block program exit
-        self.doc = doc
-        self.credentials = creds
-        self.url = url
-        self.document_path = os.path.join(os.path.dirname(__file__), "..", "..", "merges", "merged_scans.pdf")
+        self.doc: Document = doc
+        self.credentials: Credentials = creds
+        self.url: str = url
+        self.document_path: str = os.path.join(os.path.dirname(__file__), "..", "..", "merges", "merged_scans.pdf")
         print("UploadThread initialized with URL:", self.url)
 
-    def run(self):
+    def run(self) -> None:
         """Merge the document into a single PDF and upload it."""
         self.doc.merge()
         self.send_request()
 
-    def send_request(self):
+    def send_request(self) -> None:
         """
         Send the request to upload the document to the Paperless instance.
         """

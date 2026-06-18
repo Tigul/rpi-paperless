@@ -4,6 +4,7 @@ Defines the :class:`UI` class which builds the web interface, wires the
 buttons to the scanner/upload logic and persists the Paperless URL.
 """
 import os
+from typing import Optional
 
 import sane
 from nicegui import ui
@@ -34,41 +35,41 @@ class UI:
     :class:`~rpi_paperless.document.Document`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise widget references and the scanner/credentials/document state.
 
         Widget attributes are set to ``None`` here and populated later in
         :meth:`create_ui`. The directory holding the persisted Paperless URL is
         created eagerly so saving never fails on a fresh device.
         """
-        self.scan_button = None
-        self.upload_button = None
-        self.scan_and_upload_button = None
-        self.printer_select = None
-        self.user_name = None
-        self.password = None
-        self.save_credentials = None
-        self.submit_credentials = None
-        self.paperless_url_input = None
-        self.save_url = None
-        self.submit_url = None
-        self.update_scanner = None
+        self.scan_button: Optional[ui.button] = None
+        self.upload_button: Optional[ui.button] = None
+        self.scan_and_upload_button: Optional[ui.button] = None
+        self.printer_select: Optional[ui.select] = None
+        self.user_name: Optional[ui.input] = None
+        self.password: Optional[ui.input] = None
+        self.save_credentials: Optional[ui.checkbox] = None
+        self.submit_credentials: Optional[ui.button] = None
+        self.paperless_url_input: Optional[ui.input] = None
+        self.save_url: Optional[ui.checkbox] = None
+        self.submit_url: Optional[ui.button] = None
+        self.update_scanner: Optional[ui.button] = None
 
-        self.scanner_device: Scanner = None
+        self.scanner_device: Optional[Scanner] = None
 
-        self.paperless_url = None
+        self.paperless_url: Optional[str] = None
         # Anchor the saved URL next to the credentials/merges instead of the
         # current working directory, which is undefined when run as a service.
-        self.paperless_url_path = os.path.join(
+        self.paperless_url_path: str = os.path.join(
             os.path.dirname(__file__), "..", "..", "config", "paperless_url.txt")
         os.makedirs(os.path.dirname(self.paperless_url_path), exist_ok=True)
 
-        self.credentials = Credentials()
+        self.credentials: Credentials = Credentials()
 
-        self.current_document = Document()
+        self.current_document: Document = Document()
 
 
-    def create_ui(self):
+    def create_ui(self) -> None:
         """Build the page layout: the action buttons, page counter and settings.
 
         Must be called once before :meth:`start`. Populates the widget
@@ -111,7 +112,7 @@ class UI:
             ui.label("Fullscreen Mode").classes('text-lg font-bold')
             ui.button('Toggle Fullscreen', on_click=ui.fullscreen().toggle)
 
-    def update_printer_selection(self):
+    def update_printer_selection(self) -> None:
         """Refresh the scanner dropdown from the currently connected devices.
 
         If the device list changed, the dropdown options are updated, the first
@@ -127,14 +128,14 @@ class UI:
             ui.notify(f"Scanner devices updated: {devices}")
             self.update_scanner_device()
 
-    def update_scanner_device(self):
+    def update_scanner_device(self) -> None:
         """Close the current scanner (if any) and open the selected device."""
         if self.scanner_device:
             self.scanner_device.close()
         self.scanner_device = Scanner(self.printer_select.value)
 
 
-    def scan(self, upload = False):
+    def scan(self, upload: bool = False) -> None:
         """Start scanning a page with the active scanner.
 
         :param upload: If True, upload the document automatically once the scan
@@ -142,17 +143,17 @@ class UI:
         """
         self.scanner_device.scan(self.current_document, upload, self.credentials, self.paperless_url)
 
-    def upload(self):
+    def upload(self) -> None:
         """Upload the current document to Paperless in a background thread."""
         upload_thread = UploadThread(self.current_document, self.credentials,
                                      self.paperless_url, name="Upload", daemon=True)
         upload_thread.start()
 
-    def scan_and_upload(self):
+    def scan_and_upload(self) -> None:
         """Scan a page and upload the document once the scan completes."""
         self.scan(upload=True)
 
-    def do_save_url(self):
+    def do_save_url(self) -> None:
         """Apply the entered Paperless URL and optionally persist it to disk.
 
         The URL is always stored on the instance; it is only written to
@@ -166,7 +167,7 @@ class UI:
             ui.notify("Paperless URL not saved.")
         self.paperless_url = self.paperless_url_input.value
 
-    def load_paperless_url(self):
+    def load_paperless_url(self) -> None:
         """Load a previously saved Paperless URL into the instance and input field."""
         if os.path.exists(self.paperless_url_path):
             with open(self.paperless_url_path, 'r') as f:
@@ -174,7 +175,7 @@ class UI:
                 self.paperless_url_input.value = self.paperless_url
                 ui.notify(f'Loaded Paperless URL: {self.paperless_url}')
 
-    def start(self):
+    def start(self) -> None:
         """Start the NiceGUI web server (blocking).
 
         Binds to all interfaces on port 8080 with the auto-reloader disabled so

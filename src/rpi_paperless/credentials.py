@@ -1,6 +1,7 @@
 """Storage and base64 encoding of Paperless HTTP Basic-auth credentials."""
 import base64
 import os
+from typing import Optional
 
 from .utils import notify
 
@@ -12,7 +13,7 @@ class Credentials:
     so they survive restarts.
     """
 
-    def __init__(self, username: str = None, password: str = None, save_credentials: bool = False):
+    def __init__(self, username: Optional[str] = None, password: Optional[str] = None, save_credentials: bool = False) -> None:
         """Initialise the credentials store and load any previously saved value.
 
         :param username: Optional username (not used directly; encoding happens
@@ -20,16 +21,16 @@ class Credentials:
         :param password: Optional password.
         :param save_credentials: Whether credentials should be persisted by default.
         """
-        self.username = username
-        self.password = password
-        self.save_credentials = save_credentials
-        self.credentials_path = os.path.join(os.path.dirname(__file__), "..", "..", "credentials", "credentials.txt")
+        self.username: Optional[str] = username
+        self.password: Optional[str] = password
+        self.save_credentials: bool = save_credentials
+        self.credentials_path: str = os.path.join(os.path.dirname(__file__), "..", "..", "credentials", "credentials.txt")
         self.crete_directory()
 
-        self.credentials_b64 = None
+        self.credentials_b64: Optional[str] = None
         self.load_credentials()
 
-    def crete_directory(self):
+    def crete_directory(self) -> None:
         """Create the directory that holds the credentials file if it is missing."""
         if not os.path.exists(os.path.dirname(self.credentials_path)):
             os.makedirs(os.path.dirname(self.credentials_path))
@@ -37,7 +38,7 @@ class Credentials:
         else:
             print("Directory for credentials already exists.")
 
-    def load_credentials(self):
+    def load_credentials(self) -> None:
         """Load the base64-encoded credentials from disk if the file exists."""
         if os.path.exists(self.credentials_path):
             try:
@@ -49,7 +50,7 @@ class Credentials:
                 print("Credentials file not found. Please set your credentials.")
 
 
-    def encode_credentials(self, username: str, password: str, save_credentials: bool):
+    def encode_credentials(self, username: str, password: str, save_credentials: bool) -> None:
         """Base64-encode ``username:password`` and store it (optionally on disk).
 
         :param username: Paperless username.
