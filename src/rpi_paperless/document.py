@@ -1,3 +1,4 @@
+"""In-memory document made of scanned pages and PDF merging logic."""
 from __future__ import annotations
 
 import PIL
@@ -8,7 +9,10 @@ from pypdf import PdfWriter
 import os
 
 class Document:
+    """A collection of scanned pages that can be merged into a single PDF."""
+
     def __init__(self):
+        """Initialise an empty document and ensure the merge output directory exists."""
         self.pages = []
         self.document_path = os.path.join(os.path.dirname(__file__), "..", "..", "merges", )
         if not os.path.exists(self.document_path):
@@ -16,6 +20,11 @@ class Document:
 
 
     def merge(self):
+        """Write each page to a temporary PDF, merge them into ``merged_scans.pdf``.
+
+        The per-page temporary files are removed afterwards and the in-memory
+        page list is cleared.
+        """
         filenames = []
         notify("Merging scans into a single PDF...")
         for i, scan in enumerate(self.pages):
@@ -35,25 +44,39 @@ class Document:
         self.pages.clear()
 
     def add_page(self, current_scan: CurrentScan):
+        """Append a scanned page to the document.
+
+        :param current_scan: The scanned page to add.
+        """
         self.pages.append(current_scan)
         notify(f"Added scan to document. Total pages: {len(self.pages)}")
 
     @property
     def number_of_pages(self):
+        """Number of pages currently held in the document."""
         return len(self.pages)
 
     def clear(self):
+        """Discard all pages from the document."""
         self.pages.clear()
         notify("Document cleared.")
 
 
 class CurrentScan:
+    """Wraps a single scanned page (a PIL image)."""
+
     def __init__(self, scan):
+        """Store the scanned image.
+
+        :param scan: The PIL image returned by the SANE device.
+        """
         self.scan = scan
 
     def clear(self):
+        """Drop the reference to the scanned image."""
         self.scan = None
 
     def get_scans(self):
+        """Return the wrapped scanned image."""
         return self.scan
 

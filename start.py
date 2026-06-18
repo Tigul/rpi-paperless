@@ -1,3 +1,8 @@
+"""Entry point: initialise SANE, build the UI and run the web server.
+
+Run directly (``python start.py``) or via the systemd service. The
+``__mp_main__`` guard keeps it compatible with NiceGUI's reload mechanism.
+"""
 from rpi_paperless.ui import UI
 
 import sane

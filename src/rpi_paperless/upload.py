@@ -1,3 +1,4 @@
+"""Background upload of a merged document to a Paperless-ngx instance."""
 import os
 from threading import Thread, Event
 
@@ -9,14 +10,15 @@ from .utils import notify
 
 
 class UploadThread(Thread):
+    """Merges the document into a single PDF and POSTs it to Paperless-ngx."""
+
     def __init__(self, doc: Document, creds: Credentials, url: str, name: str, daemon: bool = True, *args, **kwargs):
         """
         Initialize the UploadThread.
 
         :param doc: Document to be uploaded.
-        :param scanning_event: Event if the scanner is currently scanning.
         :param creds: Credentials for authentication.
-        :param url: Upload URL for the Paperless instance.
+        :param url: Base URL of the Paperless instance (without API path).
         :param name: Name of the thread.
         :param daemon: If True, the thread will exit when the main program exits.
         :param args: Additional positional arguments.
@@ -31,6 +33,7 @@ class UploadThread(Thread):
         print("UploadThread initialized with URL:", self.url)
 
     def run(self):
+        """Merge the document into a single PDF and upload it."""
         self.doc.merge()
         self.send_request()
 
