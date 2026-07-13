@@ -1,0 +1,13 @@
+[Unit]
+Description=Chromium kiosk display for rpi-paperless
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/rpi-paperless/start-kiosk.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
