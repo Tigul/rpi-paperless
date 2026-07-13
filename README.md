@@ -39,10 +39,6 @@ cd rpi-paperless
 ./setup.sh
 ```
 
-> **Run `setup.sh` from a terminal on the Pi's desktop**, not a bare SSH shell —
-> it enables a *user* systemd service (`systemctl --user`), which needs your
-> graphical login session's bus to be present.
-
 `setup.sh` will:
 
 1. Install the `libsane-dev` and `chromium-browser` system dependencies
@@ -50,14 +46,15 @@ cd rpi-paperless
 3. Install the Python dependencies and the `rpi_paperless` package itself
 4. Symlink `rpi-paperless.service` into `/etc/systemd/system/paperless.service`,
    reload systemd and enable the service on boot
-5. Enable the `paperless-kiosk` **user** service, which launches Chromium
-   fullscreen against `http://localhost:8080` when the desktop session starts
+5. Write `~/.config/autostart/paperless-kiosk.desktop`, an XDG autostart entry
+   that launches Chromium fullscreen against `http://localhost:8080` when the
+   desktop session starts
 
-> **Note:** Both unit files assume the project lives at `/home/pi/rpi-paperless`
-> and run as the `pi` user. If you use a different path or user, edit
-> `rpi-paperless.service` (the `User`, `WorkingDirectory` and `ExecStart` lines)
-> and the `ExecStart` line of `paperless-kiosk.service` before running
-> `setup.sh`.
+> **Note:** `rpi-paperless.service` assumes the project lives at
+> `/home/pi/rpi-paperless` and runs as the `pi` user. If you use a different path
+> or user, edit its `User`, `WorkingDirectory` and `ExecStart` lines before
+> running `setup.sh`. (The kiosk autostart entry is generated with your actual
+> project path, so it needs no editing.)
 
 ### Start the service
 
@@ -70,20 +67,26 @@ The interface is then available at `http://<raspberry-pi-ip>:8080`.
 
 ### The kiosk display
 
-When the desktop session starts (log in or reboot), the `paperless-kiosk` user
-service launches Chromium fullscreen against `http://localhost:8080`. It waits
-for the server to come up first, so a few seconds' delay on boot is normal.
+When the desktop session starts (log in or reboot), the
+`~/.config/autostart/paperless-kiosk.desktop` autostart entry runs
+`start-kiosk.sh`, which launches Chromium fullscreen against
+`http://localhost:8080`. It waits for the server to come up first, so a few
+seconds' delay on boot is normal.
+
+To relaunch the browser without rebooting, run the script from a desktop
+terminal:
 
 ```bash
-systemctl --user status paperless-kiosk.service   # check it is running
-systemctl --user restart paperless-kiosk.service  # relaunch the browser
+./start-kiosk.sh
 ```
 
-If Chromium does not appear on boot, confirm your desktop session reaches
-`graphical-session.target` (the Raspberry Pi OS Bookworm default). As a fallback
-you can launch the kiosk from your compositor's autostart instead, e.g. a
-`~/.config/autostart/paperless-kiosk.desktop` entry or a wayfire/labwc autostart
-line that runs `start-kiosk.sh`.
+If Chromium does not appear on boot, confirm the autostart entry exists
+(`~/.config/autostart/paperless-kiosk.desktop`) and that `./start-kiosk.sh`
+works in a desktop terminal. The XDG autostart entry relies on the standard
+Raspberry Pi OS desktop's `lxsession-xdg-autostart`. On a non-standard
+compositor, launch `start-kiosk.sh` from that compositor's own autostart
+instead — a line in `~/.config/labwc/autostart`, or an `[autostart]` entry in
+`~/.config/wayfire.ini`.
 
 ### Running manually (for development)
 
