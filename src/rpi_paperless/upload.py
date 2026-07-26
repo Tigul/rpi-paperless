@@ -56,6 +56,9 @@ class UploadThread(Thread):
             if resp.status_code == 200:
                 notify(f"Uploaded successfully to {self.url}")
                 self.doc.clear()
+            else:
+                print(resp.text)
+                notify(f"Upload failed ({resp.status_code}): {resp.text}")
         except Exception as e:
             print(f"Failed to upload scans: {e}")
             print(f"upload URL: {url}")
