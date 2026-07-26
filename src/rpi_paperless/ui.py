@@ -44,6 +44,7 @@ class UI:
         self.save_url: Optional[ui.checkbox] = None
         self.submit_url: Optional[ui.button] = None
         self.update_scanner: Optional[ui.button] = None
+        self.resolution_input: Optional[ui.number] = None
 
         self.scanner_device: Optional[Scanner] = None
 
@@ -53,6 +54,10 @@ class UI:
         self.paperless_url_path: str = os.path.join(
             os.path.dirname(__file__), "..", "..", "config", "paperless_url.txt")
         os.makedirs(os.path.dirname(self.paperless_url_path), exist_ok=True)
+
+        self.scan_resolution: int = 300
+        self.resolution_path: str = os.path.join(
+            os.path.dirname(__file__), "..", "..", "config", "scan_resolution.txt")
 
         self.credentials: Credentials = Credentials()
 
@@ -109,6 +114,12 @@ class UI:
 
             ui.separator()
 
+            ui.label("Scan Resolution").classes('text-lg font-bold')
+            self.resolution_input = ui.number('Scan Resolution (DPI)', value=300, min=75, max=1200)
+            ui.button('Submit Resolution', on_click=lambda: self.do_save_resolution())
+
+            ui.separator()
+
             ui.label("Fullscreen Mode").classes('text-lg font-bold')
             ui.button('Toggle Fullscreen', on_click=ui.fullscreen().toggle)
 
@@ -134,7 +145,7 @@ class UI:
             return
         if self.scanner_device:
             self.scanner_device.close()
-        self.scanner_device = Scanner(self.printer_select.value)
+        self.scanner_device = Scanner(self.printer_select.value, resolution=self.scan_resolution)
 
 
     def scan(self, upload: bool = False) -> None:
@@ -176,3 +187,25 @@ class UI:
                 self.paperless_url = f.read().strip()
                 self.paperless_url_input.value = self.paperless_url
                 ui.notify(f'Loaded Paperless URL: {self.paperless_url}')
+
+    def do_save_resolution(self) -> None:
+        """Apply the entered scan resolution and persist it to disk.
+
+        Also applies it to the currently open scanner device (if any) right
+        away, so the user doesn't have to reselect the scanner to see it take
+        effect.
+        """
+        self.scan_resolution = int(self.resolution_input.value)
+        with open(self.resolution_path, 'w') as f:
+            f.write(str(self.scan_resolution))
+        if self.scanner_device:
+            self.scanner_device.set_resolution(self.scan_resolution)
+        ui.notify(f"Scan resolution set to {self.scan_resolution} DPI")
+
+    def load_scan_resolution(self) -> None:
+        """Load a previously saved scan resolution into the instance and input field."""
+        if os.path.exists(self.resolution_path):
+            with open(self.resolution_path, 'r') as f:
+                self.scan_resolution = int(f.read().strip())
+                self.resolution_input.value = self.scan_resolution
+                ui.notify(f'Loaded scan resolution: {self.scan_resolution} DPI')

@@ -15,8 +15,9 @@ app_ui = UI()
 @ui.page('/')
 def index() -> None:
     app_ui.create_ui()
-    app_ui.update_printer_selection()
     app_ui.load_paperless_url()
+    app_ui.load_scan_resolution()
+    app_ui.update_printer_selection()
 
 
 if __name__ in {"__main__", "__mp_main__"}:

@@ -20,12 +20,15 @@ import sane
 class Scanner:
     """Wraps a single SANE scanner device and tracks its in-flight scans."""
 
-    def __init__(self, scanner_device: str) -> None:
+    def __init__(self, scanner_device: str, resolution: Optional[int] = None) -> None:
         """Open the given SANE device.
 
         :param scanner_device: SANE device name (as returned by
             :meth:`get_devices`). If falsy, no device is opened and the scanner
             stays inert; :meth:`scan` will report that no device is available.
+        :param resolution: If given, the scan resolution (DPI) to request from
+            the device. Without this, the scan runs at whatever DPI the SANE
+            backend/driver defaults to, which can differ between machines.
         """
         self.device: Optional[sane.SaneDev] = None
         self.device_name: str = scanner_device
@@ -37,6 +40,24 @@ class Scanner:
             return
         print(f"Initializing scanner device: {scanner_device}")
         self.device = sane.open(scanner_device)
+        if resolution:
+            self.set_resolution(resolution)
+
+    def set_resolution(self, resolution: int) -> None:
+        """Set the SANE scan resolution (DPI) on the open device, if any.
+
+        Some backends may not expose a ``resolution`` option under that name;
+        failures are reported via :func:`notify` rather than raised, so a scan
+        can still proceed at the driver's default.
+
+        :param resolution: Desired scan resolution in DPI.
+        """
+        if not self.device:
+            return
+        try:
+            self.device.resolution = resolution
+        except Exception as e:
+            notify(f"Could not set scan resolution to {resolution} DPI: {e}")
 
     @classmethod
     def get_devices(cls) -> List[str]:
