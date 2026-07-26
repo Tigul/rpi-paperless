@@ -130,6 +130,8 @@ class UI:
 
     def update_scanner_device(self) -> None:
         """Close the current scanner (if any) and open the selected device."""
+        if self.scanner_device and self.scanner_device.device_name == self.printer_select.value:
+            return
         if self.scanner_device:
             self.scanner_device.close()
         self.scanner_device = Scanner(self.printer_select.value)

@@ -9,10 +9,11 @@ from rpi_paperless.ui import UI
 
 import sane
 
+app_ui = UI()
+
 
 @ui.page('/')
 def index() -> None:
-    app_ui = UI()
     app_ui.create_ui()
     app_ui.update_printer_selection()
     app_ui.load_paperless_url()
