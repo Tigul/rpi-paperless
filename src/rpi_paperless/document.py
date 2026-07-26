@@ -31,7 +31,7 @@ class Document:
         for i, scan in enumerate(self.pages):
             filename = f'scan_{i}.pdf'
             filepath = os.path.join(self.document_path, filename)
-            scan.scan.save(filepath)
+            scan.scan.save(filepath, format="pdf")
             filenames.append(filepath)
 
         merger = PdfWriter()

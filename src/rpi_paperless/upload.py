@@ -58,5 +58,7 @@ class UploadThread(Thread):
                 self.doc.clear()
         except Exception as e:
             print(f"Failed to upload scans: {e}")
+            print(f"upload URL: {url}")
             notify(f"Failed to upload scans due to {e}")
+            notify(f"upload URL: {url}")
 

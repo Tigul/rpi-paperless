@@ -3,20 +3,23 @@
 Run directly (``python start.py``) or via the systemd service. The
 ``__mp_main__`` guard keeps it compatible with NiceGUI's reload mechanism.
 """
+from nicegui import ui
+
 from rpi_paperless.ui import UI
 
 import sane
+
+
+@ui.page('/')
+def index() -> None:
+    app_ui = UI()
+    app_ui.create_ui()
+    app_ui.update_printer_selection()
+    app_ui.load_paperless_url()
+
 
 if __name__ in {"__main__", "__mp_main__"}:
     # SANE must be initialised before any other sane.* call is made.
     sane.init()
 
-    ui = UI()
-    ui.create_ui()
-    ui.update_printer_selection()
-    ui.load_paperless_url()
-
-    # scanner_watcher = ScannerWatcher(ui.printer_select)
-    # scanner_watcher.start()
-
-    ui.start()
+    ui.run(host="0.0.0.0", port=8080, reload=False, show=False)

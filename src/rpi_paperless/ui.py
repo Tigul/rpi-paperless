@@ -14,16 +14,6 @@ from .document import Document
 from .scanner import Scanner, ScanThread
 from .upload import UploadThread
 
-ui.add_head_html('''
-    <style type="text/tailwindcss">
-        @layer components {
-            .blue-box {
-                @apply bg-blue-500 p-20 text-center shadow-lg rounded-lg text-white;
-            }
-        }
-    </style>
-''')
-
 
 class UI:
     """Builds and runs the NiceGUI web interface.
@@ -76,6 +66,16 @@ class UI:
         attributes declared in :meth:`__init__` and binds the page counter to
         the current document's page count.
         """
+        ui.add_head_html('''
+            <style type="text/tailwindcss">
+                @layer components {
+                    .blue-box {
+                        @apply bg-blue-500 p-20 text-center shadow-lg rounded-lg text-white;
+                    }
+                }
+            </style>
+        ''')
+
         with ui.grid(columns=2).classes('w-full gap-5'):
             self.scan_button = ui.button('Scan', on_click=lambda: self.scan(), icon="document_scanner").classes(
                 'blue-box')
@@ -174,11 +174,3 @@ class UI:
                 self.paperless_url = f.read().strip()
                 self.paperless_url_input.value = self.paperless_url
                 ui.notify(f'Loaded Paperless URL: {self.paperless_url}')
-
-    def start(self) -> None:
-        """Start the NiceGUI web server (blocking).
-
-        Binds to all interfaces on port 8080 with the auto-reloader disabled so
-        it runs reliably as a systemd service.
-        """
-        ui.run(host="0.0.0.0", port=8080, reload=False, show=False)
